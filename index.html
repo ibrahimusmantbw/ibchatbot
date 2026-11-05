@@ -426,4 +426,93 @@
       }
 
       if (/(your name|who are you|what are you)/.test(text)) {
-        return "I am a chat assistant 🤖. I can answer student questions, tell stories, suggest code, do math, tell the time and more. I was created by Ibrahim usman
+        return "I am a chat assistant 🤖. I can answer student questions, tell stories, suggest code, do math, tell the time and more. I was created by " + CREATOR + ".";
+}
+      // Time and date
+      if (/\btime\b/.test(text) && !/time ?table|time management|manage.*time/.test(text)) {
+        return "🕒 The time is " + new Date().toLocaleTimeString() + ".";
+      }
+      if (/\b(date|day|today)\b/.test(text) && !/motivat/.test(text)) {
+        return "📅 Today is " + new Date().toLocaleDateString(undefined, {
+          weekday: "long", year: "numeric", month: "long", day: "numeric"
+        }) + ".";
+      }
+
+      // Jokes
+      if (/joke/.test(text)) {
+        return pick([
+          "😂 Why do programmers prefer dark mode? Because light attracts bugs.",
+          "🤣 Why did the developer go broke? Because he used up all his cache.",
+          "😆 There are 10 kinds of people: those who understand binary and those who do not.",
+          "😄 Why was the computer cold? Because it left its Windows open."
+        ]);
+      }
+
+      // Help
+      if (/\b(help|what can you do|commands)\b/.test(text)) {
+        return "I can:\n📚 Answer student questions (study tips, exams, focus, stress, GPA, timetable)\n📖 Tell stories with emojis (say \"tell me a story\")\n💻 Suggest code (say \"suggest button code\")\n➕ Do math (example: 25 * 4)\n🕒 Tell the time and date\n😂 Tell jokes\n🙋 Remember your name\n👨‍💻 Tell you who created me\n\nWhat do you want?";
+      }
+
+      // Thanks and bye
+      if (/\b(thanks|thank you)\b/.test(text)) {
+        return "You are welcome! 🤗 Is there anything else you want?";
+      }
+      if (/\b(bye|goodbye|see you)\b/.test(text)) {
+        return "Goodbye" + (userName ? " " + userName : "") + "! 👋 Come back anytime.";
+      }
+
+      // Math
+      const math = solveMath(text);
+      if (math) return "🧮 " + math;
+
+      // Student daily questions
+      const student = studentAnswer(text);
+      if (student) return student;
+
+      return pick([
+        "🤔 I did not understand that. Type \"help\" to see what I can do.",
+        "😅 Sorry, I cannot do that yet. Try asking about study tips, a story, or code.",
+        "Can you say it in another way? 🙏"
+      ]);
+    }
+
+    /* ---------- Quick buttons ---------- */
+
+    const QUICK_ITEMS = [
+      ["📖 Story", "tell me a story"],
+      ["📚 Study tips", "how to study well"],
+      ["📝 Exam tips", "exam tips"],
+      ["💻 Code", "suggest html code"],
+      ["😂 Joke", "tell me a joke"],
+      ["🔥 Motivation", "motivate me"],
+      ["❓ Help", "help"]
+    ];
+
+    function send(message) {
+      addMessage(message, "user");
+      botReply(getReply(message));
+    }
+
+    QUICK_ITEMS.forEach(function (item) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = item[0];
+      b.addEventListener("click", function () { send(item[1]); });
+      quick.appendChild(b);
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+      input.value = "";
+      send(message);
+    });
+
+    // First message
+    botReply("Hello! 👋 I can answer student questions, tell stories 📖, suggest code 💻 and more. Type \"help\" to see everything.Iam powered by Ibrahim Usman to help you solve your studies problem");
+    input.focus();
+  </script>
+
+</body>
+</html>
